@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ch 5 — Inference Deep Mastery | EC2020</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#faf8f5;--surface:#fff;--surface2:#f5f2ed;--border:#e2ddd5;
+  --text:#1a1714;--text2:#5c5549;--text3:#8a8279;
+  --blue:#2563eb;--blue-bg:#eff5ff;--blue-border:#c4d9f8;
+  --red:#dc2626;--red-bg:#fef2f2;--red-border:#fecaca;
+  --green:#16a34a;--green-bg:#f0fdf4;--green-border:#bbf7d0;
+  --amber:#d97706;--amber-bg:#fffbeb;--amber-border:#fde68a;
+  --purple:#7c3aed;--purple-bg:#f5f3ff;--purple-border:#ddd6fe;
+  --cyan:#0891b2;--cyan-bg:#ecfeff;--cyan-border:#a5f3fc;
+  --slate:#475569;
+}
+body{background:var(--bg);color:var(--text);font-family:'Source Serif 4',Georgia,serif;line-height:1.72;font-size:17px}
+.container{max-width:800px;margin:0 auto;padding:20px 24px 80px}
+
+.header{text-align:center;padding:48px 0 20px;border-bottom:3px solid var(--text)}
+.header h1{font-size:2rem;font-weight:700;letter-spacing:-.5px}
+.header .sub{font-family:'DM Sans',sans-serif;color:var(--text2);font-size:.86rem;font-weight:500;margin-top:6px}
+
+/* Nav */
+.nav{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border);padding:10px 0;display:flex;gap:5px;flex-wrap:wrap;justify-content:center}
+.nav a{font-family:'DM Sans',sans-serif;font-size:.72rem;font-weight:600;color:var(--text2);text-decoration:none;padding:5px 10px;border-radius:6px;border:1px solid var(--border);transition:all .15s;white-space:nowrap}
+.nav a:hover{background:var(--text);color:var(--bg);border-color:var(--text)}
+
+/* Concept blocks */
+.concept{margin:44px 0;scroll-margin-top:60px}
+.concept-num{font-family:'DM Sans',sans-serif;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3)}
+.concept h2{font-size:1.4rem;font-weight:700;line-height:1.3;margin:4px 0}
+.concept .one-liner{font-style:italic;color:var(--text2);font-size:.92rem;margin-bottom:18px}
+.teach p{margin-bottom:12px}
+
+/* Formula */
+.f{background:#1a1714;color:#e8e4df;padding:16px 20px;border-radius:10px;font-family:'IBM Plex Mono',monospace;font-size:.84rem;line-height:1.65;margin:14px 0;overflow-x:auto;white-space:pre-wrap}
+.f .c{color:#7d7567}
+.f .hl{color:#facc15}
+.f .g{color:#4ade80}
+.f .r{color:#fb7185}
+
+/* Boxes */
+.box{padding:16px 20px;border-radius:0 10px 10px 0;margin:16px 0}
+.box .label{font-family:'DM Sans',sans-serif;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
+.box-blue{background:var(--blue-bg);border:1px solid var(--blue-border);border-left:4px solid var(--blue)}.box-blue .label{color:var(--blue)}
+.box-red{background:var(--red-bg);border:1px solid var(--red-border);border-left:4px solid var(--red)}.box-red .label{color:var(--red)}
+.box-green{background:var(--green-bg);border:1px solid var(--green-border);border-left:4px solid var(--green)}.box-green .label{color:var(--green)}
+.box-amber{background:var(--amber-bg);border:1px solid var(--amber-border);border-left:4px solid var(--amber)}.box-amber .label{color:var(--amber)}
+.box-purple{background:var(--purple-bg);border:1px solid var(--purple-border);border-left:4px solid var(--purple)}.box-purple .label{color:var(--purple)}
+.box-cyan{background:var(--cyan-bg);border:1px solid var(--cyan-border);border-left:4px solid var(--cyan)}.box-cyan .label{color:var(--cyan)}
+
+/* Worked example */
+.worked{background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:20px 22px;margin:20px 0}
+.worked .wtitle{font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--purple);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.worked .wtitle::before{content:'✎';font-size:1rem}
+.step{margin:10px 0;padding-left:28px;position:relative}
+.step::before{content:attr(data-n);position:absolute;left:0;top:1px;font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:700;background:var(--purple);color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+
+/* Visual decision tree */
+.tree{background:var(--surface);border:2px solid var(--amber-border);border-radius:12px;padding:20px 22px;margin:20px 0}
+.tree .ttitle{font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--amber);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.tree .ttitle::before{content:'🔀'}
+.branch{display:flex;gap:12px;margin:8px 0}
+.branch .opt{flex:1;padding:12px 14px;border-radius:8px;font-size:.88rem;border:1px solid var(--border)}
+.branch .opt.yes{background:var(--green-bg);border-color:var(--green-border)}
+.branch .opt.no{background:var(--red-bg);border-color:var(--red-border)}
+.opt .optlabel{font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.opt.yes .optlabel{color:var(--green)}
+.opt.no .optlabel{color:var(--red)}
+
+/* Recall */
+.recall{background:var(--green-bg);border:1px solid var(--green-border);border-radius:12px;padding:20px 22px;margin:22px 0}
+.recall .rlabel{font-family:'DM Sans',sans-serif;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--green);margin-bottom:12px}
+.rq{margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--green-border)}
+.rq:last-child{border-bottom:none;padding-bottom:0;margin-bottom:0}
+.rq .q{font-weight:600;cursor:pointer;user-select:none;display:flex;gap:10px;align-items:flex-start}
+.rq .num{font-family:'DM Sans',sans-serif;font-size:.66rem;font-weight:700;background:var(--green);color:#fff;padding:2px 7px;border-radius:5px;flex-shrink:0;margin-top:3px}
+.rq .a{display:none;margin-top:8px;padding:12px 16px;background:#fff;border-radius:8px;font-size:.9rem;border:1px solid var(--green-border)}
+.rq.open .a{display:block}
+
+/* Cheat sheet table */
+.cs{width:100%;border-collapse:collapse;margin:16px 0;font-size:.86rem}
+.cs th{font-family:'DM Sans',sans-serif;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;background:#1a1714;color:#e8e4df;padding:10px 12px;text-align:left}
+.cs td{padding:10px 12px;border:1px solid var(--border);vertical-align:top}
+.cs tr:nth-child(even){background:var(--surface2)}
+
+code{font-family:'IBM Plex Mono',monospace;font-size:.84em;background:var(--surface2);padding:1px 5px;border-radius:3px}
+strong{font-weight:600}
+hr.div{border:none;border-top:2px solid var(--border);margin:44px 0}
+
+@media(max-width:600px){body{font-size:16px}.container{padding:16px 18px 60px}.header h1{font-size:1.5rem}.branch{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>Chapter 5 — Inference</h1>
+  <div class="sub">t-tests, F-tests, p-values, confidence intervals — from zero to exam-ready &nbsp;·&nbsp; EC2020</div>
+</div>
+
+<nav class="nav">
+  <a href="#c1">The Big Idea</a>
+  <a href="#c2">sd vs se</a>
+  <a href="#c3">t-test</a>
+  <a href="#c4">One vs Two-sided</a>
+  <a href="#c5">p-values</a>
+  <a href="#c6">CI</a>
+  <a href="#c7">Linear Combo</a>
+  <a href="#c8">Reparameterisation</a>
+  <a href="#c9">F-test</a>
+  <a href="#c10">F vs t</a>
+  <a href="#c11">Recipe</a>
+  <a href="#quiz">Quiz</a>
+</nav>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- CONCEPT 1: The Big Idea -->
+<!-- ═══════════════════════════════════════ -->
+<div class="concept" id="c1">
+<div class="concept-num">Concept 1</div>
+<h2>The Big Idea Behind All of Inference</h2>
+<div class="one-liner">Every test in this chapter asks one question: "Could the data I see have appeared by chance if the null were true?"</div>
+
+<div class="teach">
+<p>In Ch 3–4, you learned that β̂₁ is a random variable — different samples give different β̂₁ values. <strong>Inference</strong> is about using that randomness to make decisions.</p>
+
+<p>The logic is always the same, in three sentences:</p>
+
+<div class="box box-blue">
+<div class="label">The universal logic of hypothesis testing</div>
+<p><strong>1. Assume</strong> the null is true (e.g. β₁ = 0).</p>
+<p><strong>2. Ask:</strong> "If the null were true, how likely is it that I'd see a test statistic this extreme?"</p>
+<p><strong>3. Decide:</strong> If very unlikely (beyond the critical value, or p-value < α) → reject. If plausible → fail to reject.</p>
+</div>
+
+<p>That's literally it. The t-test, F-test, and all other tests are just different implementations of this same logic for different situations.</p>
+
+<p><strong>The foundation you need from Ch 3–4:</strong> Under CLM assumptions (MLR.1–6), β̂ⱼ follows a known distribution. We can standardise it, compare it to critical values, and make decisions. Without these assumptions, the distributions are wrong and the tests are invalid.</p>
+</div>
+</div>
+
+<hr class="div">
+
+<!-- ═══════════════════════════════════════ -->
+<!-- CONCEPT 2: sd vs se -->
+<!-- ═══════════════════════════════════════ -->
+<div class="concept" id="c2">
+<div class="concept-num">Concept 2</div>
+<h2>sd(β̂ⱼ) vs se(β̂ⱼ) — Why This Distinction Creates the t-Distribution</h2>
+<div class="one-liner">This is WHERE the t-distribution comes from. Miss this and the rest is just memorised formulas.</div>
+
+<div class="teach">
+
+<div class="f"><span class="c">/* Under MLR.1–6, we know: */</span>
+β̂ⱼ | X  ~  N(βⱼ, Var(β̂ⱼ))
+
+<span class="c">/* Standardise using the TRUE standard deviation: */</span>
+(β̂ⱼ − βⱼ) / <span class="hl">sd(β̂ⱼ)</span>  ~  <span class="hl">N(0, 1)</span>     ← standard normal (z-distribution)
+
+<span class="c">/* PROBLEM: sd(β̂ⱼ) = σ/√[SSTⱼ(1−Rⱼ²)] contains σ, which is UNKNOWN.
+   So we REPLACE σ with σ̂ (estimated from residuals): */</span>
+
+(β̂ⱼ − βⱼ) / <span class="g">se(β̂ⱼ)</span>  ~  <span class="g">t(n−k−1)</span>     ← t-distribution, NOT normal
+
+<span class="c">/* sd = uses σ (unknown)   → gives Normal
+   se = uses σ̂ (estimated) → gives t
+   
+   The t-distribution has HEAVIER TAILS than Normal
+   because se adds estimation uncertainty from σ̂.
+   As n → ∞, σ̂ → σ, so t → Normal.              */</span></div>
+
+<p><strong>sd(β̂ⱼ)</strong> = standard deviation = uses the <em>true</em> σ. Not computable from data. Theoretical.</p>
+<p><strong>se(β̂ⱼ)</strong> = standard error = uses the <em>estimated</em> σ̂. Computable. Reported in regression output. This is what you use for all tests.</p>
+</div>
+
+<div class="box box-blue">
+<div class="label">Why this matters</div>
+<p><strong>Degrees of freedom = n − k − 1.</strong> This is the df of the t-distribution. It comes from estimating σ̂² = SSR/(n−k−1). You have n data points, used k+1 of them to estimate parameters (β₀, β₁, …, βₖ), so n−k−1 are "free" to estimate σ². More df → t-distribution closer to Normal. With df > 120, they're practically identical.</p>
+</div>
+
+<div class="box box-red">
+<div class="label">Exam trap</div>
+<p><strong>"The OLS estimator follows a t-distribution."</strong> → FALSE. The estimator β̂ⱼ follows a Normal distribution (under CLM). The <em>standardised</em> statistic (β̂ⱼ − βⱼ)/se(β̂ⱼ) follows a t-distribution. The distinction is between the estimator and the test statistic.</p>
+</div>
+
+<div class="recall">
+<div class="rlabel">Active Recall</div>
+<div class="rq" onclick="this.classList.toggle('open')">
+  <div class="q"><span class="num">Q</span>Why does replacing sd(β̂ⱼ) with se(β̂ⱼ) change the distribution from Normal to t?</div>
+  <div class="a">Because se(β̂ⱼ) uses σ̂ (estimated) instead of σ (true). The estimate σ̂ is itself a random variable, which adds extra uncertainty. The t-distribution accounts for this by having heavier tails. With large n, σ̂ → σ and the extra uncertainty vanishes, so t → Normal.</div>
+</div>
+<div class="rq" onclick="this.classList.toggle('open')">
+  <div class="q"><span class="num">Q</span>What are the degrees of freedom in a t-test? Where does the number come from?</div>
+  <div class="a">df = n − k − 1, where n = sample size and k = number of slope parameters. It comes from estimating σ̂² = SSR/(n−k−1). We estimated k+1 parameters (one intercept + k slopes), "using up" k+1 degrees of freedom from the n data points.</div>
+</div>
+</div>
+</div>
+
+<hr class="div">
+
+<!-- ═══════════════════════════════════════ -->
+<!-- CONCEPT 3: The t-test -->
+<!-- ═══════════════════════════════════════ -->
+<div class="concept" id="c3">
+<div class="concept-num">Concept 3</div>
+<h2>The t-Test — Testing One Thing at a Time</h2>
+<div class="one-liner">Used for any hypothesis about a SINGLE parameter or a single linear combination.</div>
+
+<div class="teach">
+
+<div class="f"><span class="c">/* THE GENERAL t-STATISTIC — works for ANY null hypothesis value */</span>
+
+         β̂ⱼ − <span class="hl">hypothesised value</span>
+  t  =  ─────────────────────────────
+              se(β̂ⱼ)
+
+<span class="c">/* Examples: */</span>
+H₀: βⱼ = 0    →   t = β̂ⱼ / se(β̂ⱼ)            <span class="c">← "significance test"</span>
+H₀: βⱼ = 1    →   t = (β̂ⱼ − 1) / se(β̂ⱼ)      <span class="c">← "is the elasticity = 1?"</span>
+H₀: βⱼ = 0.4  →   t = (β̂ⱼ − 0.4) / se(β̂ⱼ)    <span class="c">← from VLE Activity 5.4</span>
+
+<span class="c">/* Under H₀ and MLR.1–6: */</span>
+  t  ~  t(n − k − 1)</div>
+
+<p><strong>What the t-statistic measures:</strong> "How many standard errors away is my estimate from the hypothesised value?" If it's many standard errors away → unlikely under H₀ → reject.</p>
+</div>
+
+<div class="worked">
+<div class="wtitle">Worked Example — From your VLE (Activity 5.4)</div>
+<p style="margin-bottom:10px">Given: ln(rent) = β₀ + β₁ln(pop) + β₂ln(avginc) + β₃pctstu + u. Results: β̂₃ = 0.0056, se(β̂₃) = 0.0017, n = 64, k = 3.</p>
+<div class="step" data-n="1"><strong>State hypotheses:</strong> H₀: β₃ = 0 vs H₁: β₃ ≠ 0</div>
+<div class="step" data-n="2"><strong>Compute t:</strong> t = 0.0056 / 0.0017 = 3.29</div>
+<div class="step" data-n="3"><strong>Find df:</strong> df = n − k − 1 = 64 − 3 − 1 = 60</div>
+<div class="step" data-n="4"><strong>Find critical value:</strong> Two-sided at 1% → t₆₀,₀.₅% = 2.660 (look up column 0.005 in t-table, row df=60)</div>
+<div class="step" data-n="5"><strong>Compare:</strong> |3.29| > 2.660 → <strong>Reject H₀</strong> at 1% level</div>
+<div class="step" data-n="6"><strong>Interpret:</strong> The student population percentage has a statistically significant effect on rent at the 1% level, under CLM assumptions.</div>
+</div>
+
+<div class="box box-amber">
+<div class="label">How to read the t-table</div>
+<p>The t-table has <strong>rows = degrees of freedom</strong> and <strong>columns = tail probability</strong>.</p>
+<p>For a <strong>two-sided test at α = 5%</strong>: each tail has 2.5% → look up column <code>0.025</code>.</p>
+<p>For a <strong>two-sided test at α = 1%</strong>: each tail has 0.5% → look up column <code>0.005</code>.</p>
+<p>For a <strong>one-sided test at α = 5%</strong>: one tail has 5% → look up column <code>0.05</code>.</p>
+<p>If your exact df isn't listed, use the <strong>next smaller df</strong> in the table (conservative approach).</p>
+</div>
+
+<table class="cs">
+<tr><th>Significance Level</th><th>One-sided column</th><th>Two-sided column</th><th>Common critical values (large df)</th></tr>
+<tr><td>10%</td><td>0.10</td><td>0.05</td><td>≈ 1.645</td></tr>
+<tr><td>5%</td><td>0.05</td><td>0.025</td><td>≈ 1.96 (often rounded to 2.0)</td></tr>
+<tr><td>1%</td><td>0.01</td><td>0.005</td><td>≈ 2.576</td></tr>
+</table>
+
+<div class="box box-red">
+<div class="label">Exam trap — what "statistically significant" does NOT mean</div>
+<p>"Significant at 5%" means: <em>if β₁ were truly zero, there is less than a 5% chance of seeing a t-statistic this extreme.</em> It does NOT mean the effect is economically large or practically important. A coefficient of 0.0001 can be "highly significant" with enough data. Always discuss economic significance separately.</p>
+</div>
+
+<div class="recall">
+<div class="rlabel">Active Recall</div>
+<div class="rq" onclick="this.classList.toggle('open')">
+  <div class="q"><span class="num">Q</span>You're testing H₀: β₂ = 0.4 and get t = 1.32 with df = 60. The two-sided 5% critical value is 2.00. What's your conclusion?</div>
+  <div class="a">|1.32| < 2.00, so we <strong>fail to reject</strong> H₀ at the 5% level. We conclude β₂ is not statistically different from 0.4. (This is the exact result from your VLE Activity 5.4v.)</div>
+</div>
+</div>
+</div>
+
+<hr class="div">
+
+<!-- ═══════════════════════════════════════ -->
+<!-- CONCEPT 4: One-sided vs Two-sided -->
+<!-- ═══════════════════════════════════════ -->
+<div class="concept" id="c4">
+<div class="concept-num">Concept 4</div>
+<h2>One-Sided vs Two-Sided Tests</h2>
+<div class="one-liner">If you know the direction, use one-sided — it's more powerful.</div>
+
+<div class="teach">
+
+<div class="tree">
+<div class="ttitle">Which test to use?</div>
+<p style="text-align:center;font-weight:600;margin-bottom:10px">Do you have a strong economic reason to expect the sign of β?</p>
+<div class="branch">
+  <div class="opt yes">
+    <div class="optlabel">Yes → One-sided</div>
+    <p>E.g. "Education should increase wages" → H₁: β₁ > 0. Or "Pollution should decrease health" → H₁: β₁ < 0.</p>
+    <p style="margin-top:6px"><strong>Reject if:</strong> t > c (right-tail) or t < −c (left-tail)</p>
+    <p><strong>Critical value:</strong> Smaller than two-sided → easier to reject → <strong>more powerful</strong></p>
+  </div>
+  <div class="opt no">
+    <div class="optlabel">No → Two-sided</div>
+    <p>E.g. "Does class size affect test scores? Could go either way."</p>
+    <p style="margin-top:6px"><strong>Reject if:</strong> |t| > c</p>
+    <p><strong>Critical value:</strong> Larger because you're checking both tails</p>
+  </div>
+</div>
+</div>
+
+<div class="f"><span class="c">/* At 5% significance with large df: */</span>
+One-sided critical value:  1.645    <span class="c">← all 5% in one tail</span>
+Two-sided critical value:  1.960    <span class="c">← 2.5% in each tail</span>
+
+<span class="c">/* So a t-stat of 1.80 would:
+   → REJECT with one-sided test  (1.80 > 1.645)  ✓
+   → FAIL TO REJECT with two-sided  (1.80 < 1.96)  ✗
+   
+   One-sided is MORE POWERFUL when the direction is correct */</span></div>
+</div>
+
+<div class="box box-amber">
+<div class="label">How the exam tests this</div>
+<p>The exam often gives you a regression output and asks you to test significance. It matters whether you choose one-sided or two-sided because you might reject with one and not the other. Your VLE says: "there is a benefit associated with using a one-sided test instead of a two-sided test when the direction of violations to the null are obvious." Always justify your choice with economic reasoning.</p>
+</div>
+
+<div class="box box-red">
+<div class="label">Exam trap — wrong tail direction</div>
+<p>If you hypothesise H₁: β₁ > 0 (expecting positive) but your t-statistic is <strong>negative</strong> (e.g. t = −2.5), you <strong>cannot reject</strong> H₀ in favour of H₁: β₁ > 0. The evidence goes the wrong way. A one-sided test only looks at ONE tail. If the t-stat falls in the opposite tail, you fail to reject regardless of its magnitude.</p>
+</div>
+
+</div>
+
+<hr class="div">
+
+<!-- ═══════════════════════════════════════ -->
+<!-- CONCEPT 5: p-values -->
+<!-- ═══════════════════════════════════════ -->
+<div class="concept" id="c5">
+<div class="concept-num">Concept 5</div>
+<h2>p-Values — The Exact Strength of Evidence</h2>
+<div class="one-liner">The p-value answers: "What's the LOWEST significance level at which I'd reject?"</div>
+
+<div class="teach">
+
+<p>Instead of comparing t to a fixed critical value at α = 5%, the p-value tells you the <em>exact probability</em> of seeing a test statistic at least as extreme as yours, assuming H₀ is true.</p>
+
+<div class="f"><span class="c">/* DECISION RULE — this is what you already know, formalised */</span>
+
+<span class="hl">If p-value < α  →  Reject H₀</span>
+<span class="hl">If p-value ≥ α  →  Fail to reject H₀</span>
+
+<span class="c">/* RELATIONSHIP between one-sided and two-sided p-values: */</span>
+
+p-value (two-sided) = 2 × p-value (one-sided)
+
+<span class="c">/* Or equivalently: */</span>
+p-value (one-sided) = ½ × p-value (two-sided)
+
+<span class="c">/* Example: t = 3.29, df = 60
+   Two-sided p-value ≈ 0.0017  (very small → strong rejection)
+   One-sided p-value ≈ 0.00085                                */</span></div>
+</div>
+
+<div class="box box-blue">
+<div class="label">How to interpret p-values in plain English</div>
+<p><strong>p = 0.03:</strong> "If β₁ were truly zero, there is only a 3% chance of seeing a t-statistic this extreme. That's unlikely → reject at 5% level, but not at 1% level."</p>
+<p><strong>p = 0.0001:</strong> "Virtually impossible under H₀ → very strong rejection at any conventional level."</p>
+<p><strong>p = 0.15:</strong> "15% chance under H₀ → not that unusual → fail to reject at 10% level."</p>
+</div>
+
+<div class="box box-red">
+<div class="label">Exam trap — p-value ≠ probability that H₀ is true</div>
+<p>The p-value is P(data this extreme | H₀ true). It is NOT P(H₀ true | data). This is a subtle but important distinction. The p-value tells you about the data under the assumption of H₀, not about the truth of H₀ given the data.</p>
+</div>
+
+<div class="box box-red">
+<div class="label">Exam trap — "fail to reject" ≠ "accept"</div>
+<p>We never say "accept H₀." We say "fail to reject H₀." Why? Because failing to find evidence against something is not the same as proving it's true. With a small sample, you might fail to reject simply because you lack power, not because H₀ is correct.</p>
+</div>
+
+<div class="recall">
+<div class="rlabel">Active Recall</div>
+<div class="rq" onclick="this.classList.toggle('open')">
+  <div class="q"><span class="num">Q</span>A two-sided p-value is 0.08. Can you reject at 10%? At 5%? What's the one-sided p-value?</div>
+  <div class="a">At 10%: 0.08 < 0.10 → <strong>reject</strong>. At 5%: 0.08 > 0.05 → <strong>fail to reject</strong>. One-sided p-value = 0.08/2 = 0.04, so one-sided rejects at 5% too.</div>
+</div>
+</div>
+</div>
+
+<hr class="div">
+
+<!-- ═══════════════════════════════════════ -->
+<!-- CONCEPT 6: Confidence intervals -->
+<!-- ═══════════════════════════════════════ -->
+<div class="concept" id="c6">
+<div class="concept-num">Concept 6</div>
+<h2>Confidence Intervals — The Dual of Hypothesis Testing</h2>
+<div class="one-liner">A 95% CI is the set of all values you would NOT reject at the 5% level.</div>
+
+<div class="teach">
+
+<div class="f"><span class="c">/* The 95% confidence interval for βⱼ: */</span>
+
+[ β̂ⱼ − t(df, 2.5%) × se(β̂ⱼ)  ,  β̂ⱼ + t(df, 2.5%) × se(β̂ⱼ) ]
+
+<span class="c">/* For 99% CI: use t(df, 0.5%) instead
+   For 90% CI: use t(df, 5%) instead
+   
+   The critical value is ALWAYS for (100−confidence)/2 in each tail */</span></div>
+
+<p><strong>Correct interpretation:</strong> "Under repeated sampling, 95% of the intervals constructed this way will contain the true βⱼ." It does NOT mean "there is a 95% probability that βⱼ is in this particular interval." The true βⱼ is fixed — it's either in there or it's not. The randomness is in the interval, not in βⱼ.</p>
+</div>
+
+<div class="box box-blue">
+<div class="label">The duality with hypothesis testing</div>
+<p>If a value a₀ lies <strong>outside</strong> the 95% CI → you would reject H₀: βⱼ = a₀ at the 5% level.</p>
+<p>If a value a₀ lies <strong>inside</strong> the 95% CI → you would fail to reject H₀: βⱼ = a₀ at the 5% level.</p>
+<p>This is why CIs and hypothesis tests always agree (for two-sided tests at corresponding levels).</p>
+</div>
+
+<div class="worked">
+<div class="wtitle">Worked Example — From your VLE (Activity 5.6vii)</div>
+<p style="margin-bottom:10px">Given: β̂₂ = 0.507, se(β̂₂) = 0.081, df = 60, t₆₀,₂.₅% = 2.00</p>
+<div class="step" data-n="1">Lower bound: 0.507 − 2.00 × 0.081 = 0.507 − 0.162 = <strong>0.345</strong></div>
+<div class="step" data-n="2">Upper bound: 0.507 + 2.00 × 0.081 = 0.507 + 0.162 = <strong>0.669</strong></div>
+<div class="step" data-n="3">95% CI: <strong>[0.345, 0.669]</strong></div>
+<div class="step" data-n="4">Since 0.4 lies inside [0.345, 0.669] → fail to reject H₀: β₂ = 0.4 at 5% ✓</div>
+</div>
+
+<div class="box box-red">
+<div class="label">Exam trap — CI interpretation</div>
+<p><strong>"There is a 95% chance that β₁ is between 0.345 and 0.669"</strong> → WRONG. The probability statement is about the <em>procedure</em> (repeated sampling), not about this specific interval. β₁ is fixed and unknown — it's either in there or it isn't. Say: "We are 95% confident" or "In 95% of samples, the interval would contain β₁."</p>
+</div>
+
+</div>
+
+<hr class="div">
+
+<!-- ═══════════════════════════════════════ -->
+<!-- CONCEPT 7: Linear combinations -->
+<!-- ═══════════════════════════════════════ -->
+<div class="concept" id="c7">
+<div class="concept-num">Concept 7</div>
+<h2>Testing a Linear Combination — "Is β₁ = β₂?" or "Is β₁ + β₂ = 1?"</h2>
+<div class="one-liner">Same t-test logic, but the standard error is harder to compute because you need the covariance.</div>
+
+<div class="teach">
+
+<p>Sometimes you want to test something like H₀: β₁ + β₂ = 1 (constant returns to scale) or H₀: β₁ = β₂ (two effects are equal). These are <strong>single linear restrictions</strong> — one equation involving parameters.</p>
+
+<div class="f"><span class="c">/* To test H₀: β₁ + β₂ = 1 */</span>
+
+        (β̂₁ + β̂₂) − 1
+t  =  ────────────────────
+        se(β̂₁ + β̂₂)
+
+<span class="c">/* The problem: se(β̂₁ + β̂₂) is NOT se(β̂₁) + se(β̂₂) !! */</span>
+
+se(β̂₁ + β̂₂)  =  √[ se(β̂₁)² + se(β̂₂)² + 2·s₁₂ ]
+
+<span class="c">/* where s₁₂ = estimated Cov(β̂₁, β̂₂)
+   This is typically NOT given in standard regression output!
+   That's why we need the REPARAMETERISATION TRICK (next concept) */</span></div>
+
+<div class="f"><span class="c">/* More generally, to test H₀: c₁β₁ + c₂β₂ = r */</span>
+
+        (c₁β̂₁ + c₂β̂₂) − r
+t  =  ──────────────────────
+       se(c₁β̂₁ + c₂β̂₂)
+
+se(c₁β̂₁ + c₂β̂₂) = √[ c₁²·se(β̂₁)² + c₂²·se(β̂₂)² + 2c₁c₂·s₁₂ ]</div>
+</div>
+
+<div class="box box-red">
+<div class="label">Exam trap — "just add the standard errors"</div>
+<p><strong>se(β̂₁ + β̂₂) ≠ se(β̂₁) + se(β̂₂).</strong> This is one of the most common exam mistakes. Standard errors don't add linearly. You must use the variance formula with the covariance term. If the covariance is not given, you CANNOT compute this directly — use the reparameterisation trick instead.</p>
+</div>
+
+</div>
+
+<hr class="div">
+
+<!-- ═══════════════════════════════════════ -->
+<!-- CONCEPT 8: Reparameterisation -->
+<!-- ═══════════════════════════════════════ -->
+<div class="concept" id="c8">
+<div class="concept-num">Concept 8 ★</div>
+<h2>The Reparameterisation Trick — The Exam's Favourite</h2>
+<div class="one-liner">Can't compute the standard error? Rewrite the model so the computer does it for you.</div>
+
+<div class="teach">
+
+<p>This trick appears in <strong>nearly every year's exam</strong>. The idea: instead of computing se(β̂₁ + β̂₂) manually (which needs the covariance), redefine a new parameter θ = β₁ + β₂, substitute into the model, and run OLS on the new model. The software gives you θ̂ and se(θ̂) directly.</p>
+
+<div class="worked">
+<div class="wtitle">Worked Example — Constant Returns to Scale (from VLE)</div>
+<p style="margin-bottom:10px"><strong>Model:</strong> ln(output) = β₀ + β₁ln(capital) + β₂ln(labour) + u</p>
+<p style="margin-bottom:10px"><strong>Test:</strong> H₀: β₁ + β₂ = 1 (constant returns to scale)</p>
+<div class="step" data-n="1"><strong>Define:</strong> θ = β₁ + β₂, so β₁ = θ − β₂</div>
+<div class="step" data-n="2"><strong>Substitute:</strong> ln(output) = β₀ + (θ − β₂)ln(K) + β₂ln(L) + u</div>
+<div class="step" data-n="3"><strong>Rearrange:</strong> ln(output) = β₀ + θ·ln(K) + β₂·(ln(L) − ln(K)) + u</div>
+<div class="step" data-n="4"><strong>Simplify:</strong> ln(output) = β₀ + θ·ln(K) + β₂·ln(L/K) + u</div>
+<div class="step" data-n="5"><strong>Run this regression</strong> → get θ̂ and se(θ̂) directly from output</div>
+<div class="step" data-n="6"><strong>Test:</strong> t = (θ̂ − 1)/se(θ̂) ~ t(n−3) under H₀</div>
+</div>
+
+<div class="worked">
+<div class="wtitle">Worked Example — Equal Coefficients (from VLE exam exercise 5.2E)</div>
+<p style="margin-bottom:10px"><strong>Model:</strong> ln(price) = β₀ + β₁ln(lotsize) + β₂bedrooms + β₃bathrooms + β₄airco + u</p>
+<p style="margin-bottom:10px"><strong>Test:</strong> H₀: β₂ = β₃ (bedrooms and bathrooms have equal effect)</p>
+<div class="step" data-n="1"><strong>Define:</strong> α₃ = β₂ − β₃, so β₂ = α₃ + β₃</div>
+<div class="step" data-n="2"><strong>Substitute:</strong> = β₀ + β₁ln(lotsize) + (α₃ + β₃)·bedrooms + β₃·bathrooms + β₄·airco + u</div>
+<div class="step" data-n="3"><strong>Rearrange:</strong> = β₀ + β₁ln(lotsize) + β₃·(bedrooms + bathrooms) + α₃·bedrooms + β₄·airco + u</div>
+<div class="step" data-n="4"><strong>Define bbrooms = bedrooms + bathrooms.</strong> Run regression of ln(price) on ln(lotsize), bbrooms, bedrooms, airco</div>
+<div class="step" data-n="5"><strong>Test:</strong> t = α̂₃/se(α̂₃) ~ t(n−5). If |t| < critical value → fail to reject → effects are equal</div>
+</div>
+
+<div class="box box-amber">
+<div class="label">The general recipe for reparameterisation</div>
+<p>1. Define θ as the thing you're testing (θ = β₁ + β₂, or θ = β₁ − β₂, etc.)</p>
+<p>2. Solve for one of the original β's in terms of θ (e.g. β₁ = θ − β₂)</p>
+<p>3. Substitute into the model and collect terms → new regressors appear</p>
+<p>4. Run the new regression → θ̂ and se(θ̂) come directly from the output</p>
+<p>5. Test H₀: θ = value using a standard t-test</p>
+</div>
+
+<div class="recall">
+<div class="rlabel">Active Recall</div>
+<div class="rq" onclick="this.classList.toggle('open')">
+  <div class="q"><span class="num">Q</span>Model: y = β₀ + β₁x₁ + β₂x₂ + β₃x₃ + u. You want to test H₀: β₁ − 3β₂ = 1. Show the reparameterised model.</div>
+  <div class="a">Define θ = β₁ − 3β₂, so β₁ = θ + 3β₂. Substitute: y = β₀ + (θ + 3β₂)x₁ + β₂x₂ + β₃x₃ + u = β₀ + θ·x₁ + β₂·(3x₁ + x₂) + β₃·x₃ + u. Run regression of y on x₁, (3x₁ + x₂), x₃. The coefficient on x₁ is θ̂, and test t = (θ̂ − 1)/se(θ̂). (This is exactly VLE Activity 5.8.)</div>
+</div>
+</div>
+</div>
+
+<hr class="div">
+
+<!-- ═══════════════════════════════════════ -->
+<!-- CONCEPT 9: F-test -->
+<!-- ═══════════════════════════════════════ -->
+<div class="concept" id="c9">
+<div class="concept-num">Concept 9 ★</div>
+<h2>The F-Test — Testing Multiple Restrictions Simultaneously</h2>
+<div class="one-liner">The t-test handles one restriction. The F-test handles q restrictions at once.</div>
+
+<div class="teach">
+
+<p><strong>Core idea:</strong> Compare the fit of the <strong>unrestricted model</strong> (your full model) with the <strong>restricted model</strong> (the model with the null hypothesis imposed). If imposing the restrictions makes the fit significantly worse → reject H₀.</p>
+
+<div class="f"><span class="c">/* THE F-STATISTIC — SSR form */</span>
+
+       (SSRᵣ − SSRᵤᵣ) / <span class="hl">q</span>
+F  =  ─────────────────────────
+        SSRᵤᵣ / <span class="hl">(n − k − 1)</span>
+
+<span class="c">/* Where:
+   SSRᵣ   = residual sum of squares of the RESTRICTED model
+   SSRᵤᵣ  = residual sum of squares of the UNRESTRICTED model
+   q      = number of restrictions (numerator df)
+   n−k−1  = df of unrestricted model (denominator df)
+   
+   Under H₀ and MLR.1–6:  F ~ F(q, n−k−1)                     */</span></div>
+
+<div class="f"><span class="c">/* THE F-STATISTIC — R² form (equivalent, often more convenient) */</span>
+
+       (R²ᵤᵣ − R²ᵣ) / q
+F  =  ─────────────────────
+       (1 − R²ᵤᵣ) / (n − k − 1)
+
+<span class="c">/* Note: R²ᵤᵣ ≥ R²ᵣ always, so F ≥ 0 always.
+   ⚠️ Both models must have the SAME dependent variable!        */</span></div>
+</div>
+
+<div class="box box-amber">
+<div class="label">How to read the F-table</div>
+<p>The F-table has <strong>numerator df = q</strong> (columns) and <strong>denominator df = n−k−1</strong> (rows). F is always positive. Rejection is always in the <strong>right tail only</strong>: reject if F > critical value. There is no "two-sided" F-test.</p>
+</div>
+
+<div class="worked">
+<div class="wtitle">Worked Example — Joint significance (VLE Activity 5.10iii)</div>
+<p style="margin-bottom:10px">Unrestricted: ln(price) on assess, lotsize, sqrft, bdrms. R²ᵤᵣ = 0.829, n = 88, k = 4.</p>
+<p style="margin-bottom:10px">Restricted: ln(price) on assess only. R²ᵣ = 0.820. Testing H₀: β_lotsize = β_sqrft = β_bdrms = 0 (q = 3).</p>
+<div class="step" data-n="1"><strong>Compute F:</strong> F = (0.829 − 0.820)/3 ÷ (1 − 0.829)/(88−4−1) = 0.003 ÷ 0.00206 = <strong>1.46</strong></div>
+<div class="step" data-n="2"><strong>Distribution:</strong> F ~ F(3, 83) under H₀</div>
+<div class="step" data-n="3"><strong>Critical value at 10%:</strong> F₃,₈₃,₁₀% ≈ 2.15</div>
+<div class="step" data-n="4"><strong>Compare:</strong> 1.46 < 2.15 → <strong>Fail to reject</strong> even at 10%</div>
+<div class="step" data-n="5"><strong>Interpret:</strong> After controlling for assess, the additional regressors are jointly not significant.</div>
+</div>
+
+<div class="box box-purple">
+<div class="label">Special case — overall significance of the regression</div>
+<p>H₀: β₁ = β₂ = … = βₖ = 0 (ALL slopes are zero). The restricted model is just ŷ = ȳ, with R²ᵣ = 0. So:</p>
+<div class="f">          R² / k
+F  =  ─────────────────
+       (1 − R²) / (n − k − 1)</div>
+<p>This tests whether the regressors jointly explain ANY variation in y. High R² → large F → reject → model is jointly significant.</p>
+</div>
+
+<div class="box box-red">
+<div class="label">Exam trap — individual t-tests vs joint F-test</div>
+<p>It is possible for EVERY individual t-test to be insignificant, yet the F-test for overall significance REJECTS. This happens with multicollinearity — the variables jointly matter but are too correlated to isolate individual effects. Your VLE Activity 5.11 shows exactly this case.</p>
+<p>Conversely, rejecting the F-test does NOT mean every individual coefficient is significant — at least one must be, but you don't know which.</p>
+</div>
+
+<div class="recall">
+<div class="rlabel">Active Recall</div>
+<div class="rq" onclick="this.classList.toggle('open')">
+  <div class="q"><span class="num">Q</span>R² = 0.0395, n = 142, k = 4. Compute the F-statistic for overall significance and test at 5%.</div>
+  <div class="a">F = (0.0395/4)/((1−0.0395)/137) = 0.009875/0.007008 = <strong>1.41</strong>. Under H₀: F ~ F(4, 137). 5% critical value with 4 and 120 df ≈ 2.45. Since 1.41 < 2.45, fail to reject. The regressors are jointly not significant. (This is Activity 5.11i.)</div>
+</div>
+<div class="rq" onclick="this.classList.toggle('open')">
+  <div class="q"><span class="num">Q</span>You have SSRᵣ = 209,449 and SSRᵤᵣ = 165,645, q = 2, dfᵤᵣ = 86. Compute F and test at 1%.</div>
+  <div class="a">F = (209,449 − 165,645)/2 ÷ 165,645/86 = 21,902 / 1,926 = <strong>11.37</strong>. Under H₀: F ~ F(2, 86). 1% critical value F₂,₉₀,₁% ≈ 4.85. Since 11.37 > 4.85 → <strong>reject</strong> H₀ at 1%. (Activity 5.10ii.)</div>
+</div>
+</div>
+</div>
+
+<hr class="div">
+
+<!-- ═══════════════════════════════════════ -->
+<!-- CONCEPT 10: F vs t -->
+<!-- ═══════════════════════════════════════ -->
+<div class="concept" id="c10">
+<div class="concept-num">Concept 10</div>
+<h2>F-test vs t-test — When to Use Which</h2>
+<div class="one-liner">For one restriction: use t. For multiple: use F. For one restriction: F = t².</div>
+
+<div class="teach">
+
+<div class="tree">
+<div class="ttitle">Decision tree</div>
+<p style="text-align:center;font-weight:600;margin-bottom:10px">How many restrictions are you testing?</p>
+<div class="branch">
+  <div class="opt yes">
+    <div class="optlabel">One restriction</div>
+    <p><strong>Use t-test.</strong> Allows one-sided alternatives (more powerful).</p>
+    <p>You CAN also use F-test (with q=1), but then F = t² and you lose the ability to do one-sided tests.</p>
+  </div>
+  <div class="opt no">
+    <div class="optlabel">Multiple restrictions (q ≥ 2)</div>
+    <p><strong>Must use F-test.</strong> You cannot test multiple restrictions with individual t-tests because they ignore correlations between estimators.</p>
+    <p>Testing each restriction separately with t-tests is NOT the same as testing them jointly.</p>
+  </div>
+</div>
+</div>
+</div>
+
+<div class="box box-red">
+<div class="label">Exam trap — "test each individually" ≠ joint test</div>
+<p>If you test H₀: β₁ = 0 and H₀: β₂ = 0 separately with two t-tests, each at 5%, the overall Type I error rate is NOT 5% — it's up to 10% (or more). The F-test controls the joint error rate properly. Individual t-tests can fail to reject while the F-test rejects, or vice versa.</p>
+</div>
+
+<hr class="div">
+
+<!-- ═══════════════════════════════════════ -->
+<!-- CONCEPT 11: The Testing Recipe -->
+<!-- ═══════════════════════════════════════ -->
+<div class="concept" id="c11">
+<div class="concept-num">Concept 11</div>
+<h2>The 5-Step Testing Recipe — What the Examiner Wants to See</h2>
+<div class="one-liner">Your VLE EXPLICITLY gives you this recipe. Follow it exactly for full marks.</div>
+
+<div class="teach">
+
+<div class="box box-purple" style="border-radius:12px;border-left-width:4px">
+<div class="label">The 5 ingredients — include ALL of them in every test</div>
+<p><strong>1. State H₀ and H₁</strong> — in terms of population parameters (β's), NOT estimates (β̂'s).</p>
+<p><strong>2. Test statistic and its distribution under H₀</strong> — write the formula, plug in numbers, and state "Under H₀ and MLR.1–6: t ~ t(df)" or "F ~ F(q, df)".</p>
+<p><strong>3. Significance level and rejection rule</strong> — state α, find the critical value from the table, write the rejection rule (e.g. "reject if |t| > 2.00").</p>
+<p><strong>4. State the assumptions</strong> — "The test assumes MLR.1 to MLR.6 are satisfied."</p>
+<p><strong>5. Economic interpretation</strong> — what does your decision mean in real-world terms?</p>
+</div>
+
+<div class="worked">
+<div class="wtitle">Full-marks exam answer template</div>
+<p style="margin-bottom:10px"><em>Given: wage regression with β̂_educ = 0.092, se = 0.007, n = 526, k = 4.</em></p>
+<div class="step" data-n="1"><strong>H₀:</strong> β_educ = 0 &nbsp;&nbsp; <strong>H₁:</strong> β_educ > 0 (one-sided, since education should increase wages)</div>
+<div class="step" data-n="2"><strong>Test statistic:</strong> t = 0.092/0.007 = 13.14. Under H₀ and MLR.1–6: t ~ t(521).</div>
+<div class="step" data-n="3"><strong>At 1% significance level:</strong> one-sided critical value t₅₂₁,₁% ≈ 2.326. Rejection rule: reject if t > 2.326.</div>
+<div class="step" data-n="4"><strong>Assumptions:</strong> This test requires MLR.1–6 (CLM assumptions) to be satisfied.</div>
+<div class="step" data-n="5"><strong>Decision:</strong> 13.14 > 2.326 → reject H₀. One additional year of education is associated with a 9.2% increase in wages, and this effect is statistically significant at the 1% level.</div>
+</div>
+
+<div class="box box-red">
+<div class="label">Common marks lost</div>
+<p>• Writing H₀: β̂₁ = 0 instead of H₀: β₁ = 0 (testing the parameter, not the estimate!)</p>
+<p>• Forgetting to state the distribution under H₀</p>
+<p>• Forgetting to mention the assumptions (MLR.1–6)</p>
+<p>• Using "accept H₀" instead of "fail to reject H₀"</p>
+<p>• Giving a statistical conclusion without economic interpretation</p>
+</div>
+</div>
+
+<hr class="div">
+
+<!-- ═══════════════════════════════════════ -->
+<!-- MASTER CHEAT SHEET -->
+<!-- ═══════════════════════════════════════ -->
+<div class="concept">
+<div class="concept-num">Reference</div>
+<h2>Complete Cheat Sheet — Every Formula You Need</h2>
+
+<table class="cs">
+<tr>
+  <th>Scenario</th>
+  <th>Test Statistic</th>
+  <th>Distribution under H₀</th>
+  <th>Rejection Rule</th>
+</tr>
+<tr>
+  <td>H₀: βⱼ = 0 (significance)</td>
+  <td>t = β̂ⱼ / se(β̂ⱼ)</td>
+  <td>t(n−k−1)</td>
+  <td>|t| > c (two-sided) or t > c (one-sided)</td>
+</tr>
+<tr>
+  <td>H₀: βⱼ = aⱼ (any value)</td>
+  <td>t = (β̂ⱼ − aⱼ) / se(β̂ⱼ)</td>
+  <td>t(n−k−1)</td>
+  <td>Same as above</td>
+</tr>
+<tr>
+  <td>H₀: β₁ + β₂ = c</td>
+  <td>t = (β̂₁+β̂₂−c) / se(β̂₁+β̂₂)</td>
+  <td>t(n−k−1)</td>
+  <td>Need Cov or reparameterise</td>
+</tr>
+<tr>
+  <td>H₀: q joint restrictions</td>
+  <td>F = (SSRᵣ−SSRᵤᵣ)/q ÷ SSRᵤᵣ/(n−k−1)</td>
+  <td>F(q, n−k−1)</td>
+  <td>F > Fq,n−k−1,α (right tail only)</td>
+</tr>
+<tr>
+  <td>Overall significance</td>
+  <td>F = (R²/k) / ((1−R²)/(n−k−1))</td>
+  <td>F(k, n−k−1)</td>
+  <td>F > Fk,n−k−1,α</td>
+</tr>
+<tr>
+  <td>95% Confidence Interval</td>
+  <td colspan="3">[β̂ⱼ − t(df,2.5%)·se(β̂ⱼ) , β̂ⱼ + t(df,2.5%)·se(β̂ⱼ)]</td>
+</tr>
+</table>
+
+<table class="cs">
+<tr><th>Degrees of Freedom</th><th>Formula</th><th>Intuition</th></tr>
+<tr><td>t-test df</td><td>n − k − 1</td><td>n observations minus (k slopes + 1 intercept) estimated</td></tr>
+<tr><td>F-test numerator df</td><td>q</td><td>Number of restrictions being tested</td></tr>
+<tr><td>F-test denominator df</td><td>n − k − 1</td><td>Same as t-test df (from unrestricted model)</td></tr>
+</table>
+</div>
+
+<hr class="div">
+
+<!-- ═══════════════════════════════════════ -->
+<!-- FINAL QUIZ -->
+<!-- ═══════════════════════════════════════ -->
+<div class="concept" id="quiz">
+<div class="concept-num">Final Challenge</div>
+<h2>15 Active Recall Questions — Exam-Level</h2>
+<div class="one-liner">Can you answer every one correctly with full justification? Then you own Ch 5.</div>
+
+<div class="recall" style="margin-top:16px">
+<div class="rlabel">Click to reveal answers</div>
+
+<div class="rq" onclick="this.classList.toggle('open')">
+  <div class="q"><span class="num">1</span>What are the CLM assumptions? Why are they needed for the t and F tests?</div>
+  <div class="a">CLM = MLR.1–MLR.6 (Gauss-Markov assumptions plus normality of errors). They are needed because the exact distributions t ~ t(n−k−1) and F ~ F(q, n−k−1) are derived under these assumptions. Without MLR.6 (normality), the distributions are only approximately correct in large samples. Without MLR.5, standard errors are wrong, so the test statistics themselves are incorrect.</div>
+</div>
+
+<div class="rq" onclick="this.classList.toggle('open')">
+  <div class="q"><span class="num">2</span>Why is the test statistic (β̂ⱼ − βⱼ)/se(β̂ⱼ) t-distributed and not normally distributed?</div>
+  <div class="a">Because se(β̂ⱼ) uses σ̂ (an estimate of σ) rather than the true σ. The estimation of σ introduces additional randomness. The ratio of a Normal random variable divided by an independent chi-squared random variable (appropriately scaled) gives a t-distribution. As n → ∞, σ̂ → σ and t → N(0,1).</div>
+</div>
+
+<div class="rq" onclick="this.classList.toggle('open')">
+  <div class="q"><span class="num">3</span>Regression output shows β̂₁ = 1.334, se(β̂₁) = 0.091, n = 430, k = 2. Test H₀: β₁ = 1 vs H₁: β₁ > 1 at 5%. Full recipe.</div>
+  <div class="a"><strong>1.</strong> H₀: β₁ = 1, H₁: β₁ > 1 (one-sided). <strong>2.</strong> t = (1.334 − 1)/0.091 = 3.67. Under H₀ and MLR.1–6: t ~ t(427). <strong>3.</strong> One-sided 5% critical value t₄₂₇,₅% ≈ 1.645. Reject if t > 1.645. <strong>4.</strong> Assumes MLR.1–6. <strong>5.</strong> 3.67 > 1.645 → reject H₀. The elasticity is significantly greater than 1. (From VLE exam exercise 5.1Ee.)</div>
+</div>
+
+<div class="rq" onclick="this.classList.toggle('open')">
+  <div class="q"><span class="num">4</span>True or False: "If a coefficient is statistically significant at 1%, it must be economically important."</div>
+  <div class="a"><strong>FALSE.</strong> Statistical significance only means the effect is distinguishable from zero given the sample size. A coefficient of 0.0001 can be highly significant with enough data. Economic significance depends on the magnitude of the effect in context. You should ALWAYS discuss both. Your VLE's Activity 5.3: ros has coefficient 0.00024 — statistically insignificant AND economically tiny (50% increase in ros → only 1.2% salary increase).</div>
+</div>
+
+<div class="rq" onclick="this.classList.toggle('open')">
+  <div class="q"><span class="num">5</span>Construct the 99% CI given: β̂₃ = 0.0056, se(β̂₃) = 0.0017, df = 60, t₆₀,₀.₅% = 2.660.</div>
+  <div class="a">[0.0056 − 2.660 × 0.0017, 0.0056 + 2.660 × 0.0017] = [0.0056 − 0.00452, 0.0056 + 0.00452] = <strong>[0.0011, 0.0101]</strong>. Since 0 is NOT in this interval, β₃ is significantly different from zero at the 1% level. (VLE Activity 5.6vi.)</div>
+</div>
+
+<div class="rq" onclick="this.classList.toggle('open')">
+  <div class="q"><span class="num">6</span>True or False: "If zero lies inside the 95% CI for βⱼ, then βⱼ is significantly different from zero at the 5% level."</div>
+  <div class="a"><strong>FALSE — it's the opposite!</strong> If zero is inside the 95% CI, you FAIL to reject H₀: βⱼ = 0 at 5%. If zero is outside the 95% CI, you reject at 5%. The CI contains all values you would fail to reject.</div>
+</div>
+
+<div class="rq" onclick="this.classList.toggle('open')">
+  <div class="q"><span class="num">7</span>Explain the reparameterisation trick for testing H₀: β₂ = β₃ in the model y = β₀ + β₁x₁ + β₂x₂ + β₃x₃ + u.</div>
+  <div class="a">Define θ = β₂ − β₃, so β₂ = θ + β₃. Substitute: y = β₀ + β₁x₁ + (θ + β₃)x₂ + β₃x₃ + u = β₀ + β₁x₁ + θ·x₂ + β₃·(x₂ + x₃) + u. Run regression of y on x₁, x₂, and (x₂ + x₃). The coefficient on x₂ gives θ̂ and se(θ̂). Test H₀: θ = 0 with t = θ̂/se(θ̂).</div>
+</div>
+
+<div class="rq" onclick="this.classList.toggle('open')">
+  <div class="q"><span class="num">8</span>Why can't you test H₀: β₁ = β₂ = 0 by running two separate t-tests?</div>
+  <div class="a">Two separate t-tests each control Type I error at α individually, but NOT jointly. If each is at 5%, the probability of rejecting at least one true null can be up to 10% (and depends on the correlation between test statistics). The F-test properly controls the joint Type I error rate. Also, individual t-tests can both fail to reject while the F-test rejects (multicollinearity scenario), or individual t-tests can reject while the F-test doesn't (rare but possible).</div>
+</div>
+
+<div class="rq" onclick="this.classList.toggle('open')">
+  <div class="q"><span class="num">9</span>Write the F-statistic for testing H₀: β₃ = β₄ = β₅ = 0 in a model with 5 regressors and n = 200. Use the R² form.</div>
+  <div class="a">q = 3 restrictions. Unrestricted model has k = 5. Restricted model drops x₃, x₄, x₅ (keeps x₁, x₂). F = (R²ᵤᵣ − R²ᵣ)/3 ÷ (1 − R²ᵤᵣ)/(200 − 5 − 1) = (R²ᵤᵣ − R²ᵣ)/3 ÷ (1 − R²ᵤᵣ)/194. Under H₀: F ~ F(3, 194).</div>
+</div>
+
+<div class="rq" onclick="this.classList.toggle('open')">
+  <div class="q"><span class="num">10</span>True or False: "The F-statistic can be negative."</div>
+  <div class="a"><strong>FALSE.</strong> F = (SSRᵣ − SSRᵤᵣ)/q ÷ SSRᵤᵣ/df. Since the unrestricted model always fits at least as well as the restricted (SSRᵤᵣ ≤ SSRᵣ), the numerator ≥ 0. The denominator is always positive. So F ≥ 0 always. Similarly in R² form: R²ᵤᵣ ≥ R²ᵣ always.</div>
+</div>
+
+<div class="rq" onclick="this.classList.toggle('open')">
+  <div class="q"><span class="num">11</span>True or False: "You can use the R² form of the F-test to compare ln(y) = β₀ + β₁x + u vs y = α₀ + α₁x + v."</div>
+  <div class="a"><strong>FALSE.</strong> The R² form requires BOTH models to have the SAME dependent variable. Here one has ln(y) and the other has y — you cannot compare their R² values. The R² from different dependent variables measure explained variation in different things.</div>
+</div>
+
+<div class="rq" onclick="this.classList.toggle('open')">
+  <div class="q"><span class="num">12</span>What happens to the t-test and F-test if heteroskedasticity is present?</div>
+  <div class="a">Both become INVALID. The usual standard errors are wrong under heteroskedasticity (MLR.5 fails), so t-statistics computed from them don't follow a t-distribution. Similarly, the usual F-statistic doesn't follow an F-distribution. <strong>Fix:</strong> Use heteroskedasticity-robust standard errors for t-tests, and a heteroskedasticity-robust F-statistic (Wald test) for joint tests (Ch 8).</div>
+</div>
+
+<div class="rq" onclick="this.classList.toggle('open')">
+  <div class="q"><span class="num">13</span>When testing one restriction, show that F = t².</div>
+  <div class="a">With q = 1 restriction H₀: βⱼ = 0, both tests give the same conclusion. The F-stat with one restriction equals the square of the t-stat: F = t². Since F ≥ 0, the F-test is always two-sided. The advantage of using t instead of F for a single restriction is that t preserves the sign, allowing one-sided tests.</div>
+</div>
+
+<div class="rq" onclick="this.classList.toggle('open')">
+  <div class="q"><span class="num">14</span>A two-sided p-value is 0.04. What is the one-sided p-value (in the correct direction)? At what significance levels do you reject for each?</div>
+  <div class="a">One-sided p-value = 0.04/2 = <strong>0.02</strong>. Two-sided: reject at 5% (0.04 < 0.05), fail to reject at 1% (0.04 > 0.01). One-sided: reject at 5% (0.02 < 0.05) AND at 2.5% (0.02 < 0.025), fail to reject at 1% (0.02 > 0.01).</div>
+</div>
+
+<div class="rq" onclick="this.classList.toggle('open')">
+  <div class="q"><span class="num">15</span>True or False: "Failing to reject H₀ means the null hypothesis is true."</div>
+  <div class="a"><strong>FALSE.</strong> Failing to reject means we do not have sufficient evidence to reject H₀ at our chosen significance level. The null could still be false — we might simply lack the statistical power to detect it (e.g. small sample size, large SE). This is why we say "fail to reject" and never "accept H₀." Absence of evidence is not evidence of absence.</div>
+</div>
+
+</div>
+</div>
+
+</div><!-- end container -->
+</body>
+</html>
